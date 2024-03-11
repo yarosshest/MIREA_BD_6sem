@@ -1,0 +1,156 @@
+\ProvidesPackage{Style}
+
+
+
+\frenchspacing
+\pagestyle{plain}
+\RequirePackage{enumitem}
+\RequirePackage{multirow}
+\RequirePackage{longtable}
+\RequirePackage{graphicx}
+\setlist{nosep}
+\setlist[enumerate]{label*=\arabic*.}
+\setlist[description]{style=nextline}
+\RequirePackage[left=3cm, right=1.5cm, vmargin=2cm]{geometry}
+\linespread{1.5} % line spacing 1.5
+\RequirePackage{indentfirst} % indent first paragraph
+\setlength{\parindent}{1.25cm}
+\sloppy
+\RequirePackage{cmap} % for pdfLaTeX
+\RequirePackage[T1,T2A]{fontenc} % correct encoding for pdfLaTeX
+\RequirePackage[utf8]{inputenc} % correct encoding source file
+\RequirePackage[english,russian]{babel} % correct language
+\RequirePackage[labelsep=period]{caption}
+\RequirePackage[final]{pdfpages}
+
+\linespread{1.5} % line spacing 1.5
+\setlength{\parindent}{1.25cm}
+\sloppy
+
+% for graphics
+\RequirePackage{amsmath}
+
+
+\renewcommand{\figurename}{Рисунок}
+
+\newcommand{\img}[2] {
+	\begin{figure}[ht!]
+		\center{\includegraphics[width=0.9\textwidth]{#1}}
+		\caption{#2}
+		\label{fig:#1}
+	\end{figure}
+}
+\RequirePackage{xcolor}
+\RequirePackage{listings}
+\RequirePackage[dvipsnames]{xcolor}
+
+\newcommand\YAMLcolonstyle{\color{red}\mdseries}
+\newcommand\YAMLkeystyle{\color{black}\bfseries}
+\newcommand\YAMLvaluestyle{\color{blue}\mdseries}
+
+\makeatletter
+
+% here is a macro expanding to the name of the language
+% (handy if you decide to change it further down the road)
+\newcommand\language@yaml{yaml}
+
+\expandafter\expandafter\expandafter\lstdefinelanguage
+\expandafter{\language@yaml}
+{
+	breaklines=true
+	keywords={true,false,null,y,n},
+	keywordstyle=\color{darkgray}\bfseries,
+	basicstyle=\YAMLkeystyle,                                 % assuming a key comes first
+	sensitive=false,
+	comment=[l]{\#},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{purple}\ttfamily,
+	stringstyle=\YAMLvaluestyle\ttfamily,
+	moredelim=[l][\color{orange}]{\&},
+	moredelim=[l][\color{magenta}]{*},
+	moredelim=**[il][\YAMLcolonstyle{:}\YAMLvaluestyle]{:},   % switch to value style at :
+	morestring=[b]',
+	morestring=[b]",
+	literate =    {---}{{\ProcessThreeDashes}}3
+		{>}{{\textcolor{red}\textgreater}}1
+		{|}{{\textcolor{red}\textbar}}1
+		{\ -\ }{{\mdseries\ -\ }}3,
+}
+
+% switch to key style at EOL
+\lst@AddToHook{EveryLine}{\ifx\lst@language\language@yaml\YAMLkeystyle\fi}
+\makeatother
+
+\newcommand\ProcessThreeDashes{\llap{\color{cyan}\mdseries-{-}-}}
+
+
+
+\renewenvironment{enumerate}{
+	\begin{list}{\labelenumi}
+	  {\usecounter{enumi} \def\makelabel##1{\hss ##1}
+	\setlength{\itemsep}{0pt}
+	\setlength{\parskip}{0pt}
+	\setlength{\parsep}{0pt}
+	\setlength{\topsep}{0pt}
+	\setlength{\partopsep}{0pt}
+}}{\end{list}}
+
+\renewenvironment{itemize}{
+	\begin{list}{\labelitemi}
+	  {\def\makelabel##1{\hss ##1}
+	\setlength{\itemsep}{0pt}
+	\setlength{\parskip}{0pt}
+	\setlength{\parsep}{0pt}
+	\setlength{\topsep}{0pt}
+	\setlength{\partopsep}{0pt}
+}}{\end{list}}
+
+% self title function
+\newcommand{\mytitle}[1]{
+	\begin{center}
+		\includegraphics[scale=0.5]{../logo.png} \break % вставка логотипа
+		\normalsize{МИНОБРНАУКИ РОССИИ}\\
+		\normalsize{Федеральное государственное бюджетное образовательное учреждение высшего образования}\\
+		\normalsize{\textbf{«МИРЭА --- Российский технологический университет»}}\\
+		\large{\textbf{РТУ МИРЭА}}\\
+		\bigskip \hrule \smallskip \hrule \smallskip
+		\textbf{Институт Информационных технологий (ИИТ)}\\
+		\textbf{Кафедра практической и прикладной инфоматики (ППИ)}\\
+		\vfill
+		\large{\textbf{ОТЧЕТ ПО ПРАКТИЧЕСКОЙ РАБОТЕ}}\\
+		\normalsize{по дисциплине «Моделирование бизнес-процессов»}\\
+		\vfill
+		\large{\textbf{Практическое задание №#1}}\\
+		\large{\textbf{Задание №1}}\\
+		\vfill
+		\vfill
+		\normalsize{
+			\begin{tabular}{llr}
+				Студент группы
+				& ИКБО-06-21  Шестаков Я.Е.
+				& $\underset{\text{(подпись)}}{\underline{\hspace{0.2\textwidth}}}$ \\\\
+				Доцент & Геращенко Л.А
+				& $\underset{\text{(подпись)}}{\underline{\hspace{0.2\textwidth}}}$ \\\\\\
+				Отчет предоставлен
+				& <<\underline{\hspace{1cm}}>>\underline{\hspace{3cm}} 2023г
+				& \\\\
+			\end{tabular}
+		}
+	\end{center}
+
+	\begin{center} Москва 2023 \end{center}
+
+
+
+	\thispagestyle{empty}
+	\newpage
+}
+
+\newenvironment{image}{
+	\begin{figure}[h!tp]
+		\centering
+		}{
+	\end{figure}
+}
+
+\newcommand\includegrph[1]{\includegraphics[width=1\textwidth]{#1}}

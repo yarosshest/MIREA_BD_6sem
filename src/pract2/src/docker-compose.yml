@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  cas1:
+    image: cassandra:latest
+    container_name: cas1
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=shestakov_y_e
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+    networks:
+      - cassandra-network
+  cas2:
+    image: cassandra:latest
+    container_name: cas2
+    environment:
+      - CASSANDRA_SEEDS=cas1
+      - CASSANDRA_CLUSTER_NAME=shestakov_y_e
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+    networks:
+      - cassandra-network
+  cas3:
+    image: cassandra:latest
+    container_name: cas3
+    environment:
+      - CASSANDRA_SEEDS=cas1
+      - CASSANDRA_CLUSTER_NAME=shestakov_y_e
+      - CASSANDRA_DC=datacenter2
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+    networks:
+      - cassandra-network
+networks:
+  cassandra-network:
+    driver: bridge
