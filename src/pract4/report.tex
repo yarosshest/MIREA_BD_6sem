@@ -1,4 +1,4 @@
-\graphicspath{{/img}} % path to graphics
+\graphicspath{{img}} % path to graphics
 
 \section*{\LARGE Выполнение практической работы}
 \addcontentsline{toc}{section}{Выполнение практической работы}
@@ -31,65 +31,155 @@
 
 Запустим его:
 
-\begin{image}
-	\includegrph{img/img1.png}
-	\caption{Запуск Docker compouse}
-	\label{fig:docker}
-\end{image}
+\img{img.png}{Запуск Docker compouse}
 
-Для того чтобы удостовериться, что весь кластер работает правильно
-необходимо выполнить команду \texttt{docker exec -ti cas1 nodetool status}
-(рис.~\ref{fig:status}).
+\section{Ключи в Cassandra}
 
-\begin{image}
-	\includegrph{img/img2.png}
-	\caption{Вывод статуса узлов}
-	\label{fig:status}
-\end{image}
+Для начала подключимся к любому из контейнеру.
+\begin{verbatim}
+	docker exec -it cas1 cqlsh
+\end{verbatim}
 
-Теперь необходимо создать свою схему бд (в кассандре это
-пространство ключей) для этого необходимо перейти в утилиту \texttt{cqlsh}
-при помощи команды \texttt{docker exec -ti cas1 cqlsh} и выполнить скрипт,
-где название кейспейса можно придумать самому (желательно номер
-студенческого или другой идентификатор).
+\begin{verbatim}
+	CREATE KEYSPACE learn_cassandra WITH REPLICATION = {
+	'class' : 'NetworkTopologyStrategy',
+	'datacenter1' : 2
+	};
+\end{verbatim}
 
-\begin{image}
-	\includegrph{img/img3.png}
-	\caption{Создание пространства ключей}
-	\label{fig:keyspace}
-\end{image}
+\img{img1.png}{Содание KEYSPACE}
 
-Создадим базу данных и заполним ее значениями.
-(рис.~\ref{fig:full}).
+Создадим таблицу
+\begin{verbatim}
+CREATE TABLE learn_cassandra.users_by_country (
+	country text,
+	user_email text,
+	first_name text,
+	last_name text,
+	age smallint,
+	PRIMARY KEY ((country), user_email)
+);
+\end{verbatim}
 
-\begin{image}
-	\includegrph{img/img4.png}
-	\caption{Заполнение таблицы}
-	\label{fig:full}
-\end{image}
+Давайте наполним таблицу некоторыми данными
+\begin{verbatim}
+INSERT INTO learn_cassandra.users_by_country
+(country,user_email,first_name,last_name,age)
+ VALUES('US', 'john@email.com', 'John','Wick',55);
+INSERT INTO learn_cassandra.users_by_country
+(country,user_email,first_name,last_name,age)
+ VALUES('UK', 'peter@email.com', 'Peter','Clark',65);
+INSERT INTO learn_cassandra.users_by_country
+(country,user_email,first_name,last_name,age)
+ VALUES('UK', 'bob@email.com', 'Bob','Sandler',23);
+INSERT INTO learn_cassandra.users_by_country
+(country,user_email,first_name,last_name,age)
+ VALUES('UK', 'alice@email.com', 'Alice','Brown',26);
+\end{verbatim}
 
-Теперь проверим, что на всех узлах есть созданные таблицы
-(рис.~\ref{fig:check}).
+Давайте создадим еще одну таблицу и заполним их записями.
+Раздел будет определяться только столбцом user\_email.
 
-\begin{image}
-	\includegrph{img/img5.png}
-	\caption{Содержимое пространства ключей на разных узлах}
-	\label{fig:check}
-\end{image}
+\begin{verbatim}
+CREATE TABLE learn_cassandra.users_by_email (
+ user_email text,
+ country text,
+ first_name text,
+ last_name text,
+ age smallint,
+ PRIMARY KEY (user_email)
+);
+INSERT INTO learn_cassandra.users_by_email (user_email,
+country,first_name,last_name,age)
+ VALUES('john@email.com', 'US', 'John','Wick',55);
+INSERT INTO learn_cassandra.users_by_email
+(user_email,country,first_name,last_name,age)
+ VALUES('peter@email.com', 'UK', 'Peter','Clark',65);
+INSERT INTO learn_cassandra.users_by_email
+(user_email,country,first_name,last_name,age)
+ VALUES('bob@email.com', 'UK', 'Bob','Sandler',23);
+INSERT INTO learn_cassandra.users_by_email
+(user_email,country,first_name,last_name,age)
+ VALUES('alice@email.com', 'UK', 'Alice','Brown',26);
+\end{verbatim}
 
-\clearpage
+Кассандра старается избегать вредных запросов.
+Если вы хотите выполнить фильтрацию по столбцу, который не является ключом раздела, вам
+необходимо это явно указать, как показано в следующей команде:
 
-Модель базы данных из прошлого семестра (рис.~\ref{fig:past}).
+\begin{verbatim}
+SELECT * FROM learn_cassandra.users_by_email WHERE age=26 ALLOW FILTERING;
+\end{verbatim}
 
-\begin{image}
-	\includegrph{img/img6.png}
-	\caption{Модель базы данных из прошлого семестра}
-	\label{fig:past}
-\end{image}
+\img{img2.png}{Фильтрация по столбцу}
+
+\section{Согласованность}
+
+Мы устанавливали коэффициент репликации равным 2.
+Таким образом, можно использовать уровень согласованности ALL или TWO.
+Для выбора уровня согласованности пропишем команды, а дальше получим данные из БД.
+
+\begin{verbatim}
+CONSISTENCY ALL;
+SELECT * FROM learn_cassandra.users_by_country WHERE country='US';
+\end{verbatim}
+
+Если высокая согласованность не важна, то можно прописать уровень
+согласованности, равный 1.
+За счет этого повышается скорость обработки запросов
+
+\begin{verbatim}
+CONSISTENCY ONE;
+SELECT * FROM learn_cassandra.users_by_country WHERE country='US';
+\end{verbatim}
+
+\img{img3.png}{Согласованность}
+
+По умолчанию в таблицах используется SizeTieredCompactionStrategy.
+Проверим это командой
+\begin{verbatim}
+DESCRIBE TABLE learn_cassandra.users_by_country;
+\end{verbatim}
+
+
+
+\img{img4.png}{users\_by\_country}
+
+В таблице users\_by\_country можно определить age как еще один столбец
+кластеризации для сортировки данных.
+\begin{verbatim}
+CREATE TABLE learn_cassandra.users_by_country_sorted_by_age_asc (
+ country text,
+ user_email text,
+ first_name text,
+ last_name text,
+ age smallint,
+ PRIMARY KEY ((country), age, user_email)) WITH CLUSTERING ORDER BY (age ASC);
+\end{verbatim}
+
+Вставьте данные в таблицу и удостоверьтесь, что записи придут в порядке
+увеличения возраста
+
+\begin{verbatim}
+INSERT INTO learn_cassandra.users_by_country_sorted_by_age_asc
+(country,user_email,first_name,last_name,age) VALUES('US','john@email.com',
+'John','Wick',10);
+INSERT INTO learn_cassandra.users_by_country_sorted_by_age_asc
+(country,user_email,first_name,last_name,age) VALUES('UK', 'peter@email.com',
+'Peter','Clark',30);
+INSERT INTO learn_cassandra.users_by_country_sorted_by_age_asc
+(country,user_email,first_name,last_name,age) VALUES('UK', 'bob@email.com',
+'Bob','Sandler',20);
+INSERT INTO learn_cassandra.users_by_country_sorted_by_age_asc
+(country,user_email,first_name,last_name,age) VALUES('UK', 'alice@email.com',
+'Alice','Brown',40);
+SELECT * FROM learn_cassandra.users_by_country_sorted_by_age_asc;
+\end{verbatim}
+
+\img{img5.png}{users\_by\_country\_sorted\_by\_age\_asc}
+
 
 \section*{\LARGE Вывод}
 \addcontentsline{toc}{section}{Вывод}
-В результате практической работы была изучена работа
-с распределенной бд, используя Apache Cassandra.\par
-Были созданы докер контейнеры прдеставляющие разные узлы.
-И базе данных созданы таблицы.
+В результате практической работы были изучены Особенности при создании таблиц Cassandra, ключи и согласованность
+в Cassandra.
