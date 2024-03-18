@@ -1,0 +1,102 @@
+\graphicspath{{/img}} % path to graphics
+
+
+\section*{\LARGE Выполнение практической работы}
+\addcontentsline{toc}{section}{Выполнение практической работы}
+
+\section{Утилита sstabledump и ее установка}
+
+Для начала необходимо скачать образ Cassandra и запустить контейнер.
+Далее нужно зайти в консоль контейнера.
+
+\img{img}{Консоль контейнера}
+
+Скачаем пакет cassandra-tools
+\
+
+
+
+Создадим контейнер с первым узлом кассандры, где
+\texttt{CASSANDRA\_CLUSTER\_NAME} можно задать своё.
+
+Присоединяем к нему следующий узел, где
+\texttt{CASSANDRA\_CLUSTER\_NAME} задаём такой же, как в первом узле.
+
+Присоединяем к первому узлу следующий узел, где
+\texttt{CASSANDRA\_CLUSTER\_NAME} задаём такой же, как в первом узле,
+но меняем значение \texttt{CASSANDRA\_DC=datacenter1} на \texttt{datacenter2},
+тем самым создаём новый узел в «как бы удалённом» датацентре:
+
+Теперь у нас есть целый кластер кассандры, в котором все данные
+синхронизированы, таким образом все модификации с бд, которые
+будут проводиться будут применены ко всему кластеру и неважно с
+какого узла эти самые изменения произошли (рис.~\ref{fig:docker}).
+
+Вот docker-compose.yml фаил:
+
+\lstinputlisting[language=yaml]{src/docker-compose.yml}
+
+Запустим его:
+
+\begin{image}
+	\includegrph{img/img1.png}
+	\caption{Запуск Docker compouse}
+	\label{fig:docker}
+\end{image}
+
+Для того чтобы удостовериться, что весь кластер работает правильно
+необходимо выполнить команду \texttt{docker exec -ti cas1 nodetool status}
+(рис.~\ref{fig:status}).
+
+\begin{image}
+	\includegrph{img/img2.png}
+	\caption{Вывод статуса узлов}
+	\label{fig:status}
+\end{image}
+
+Теперь необходимо создать свою схему бд (в кассандре это
+пространство ключей) для этого необходимо перейти в утилиту \texttt{cqlsh}
+при помощи команды \texttt{docker exec -ti cas1 cqlsh} и выполнить скрипт,
+где название кейспейса можно придумать самому (желательно номер
+студенческого или другой идентификатор).
+
+\begin{image}
+	\includegrph{img/img3.png}
+	\caption{Создание пространства ключей}
+	\label{fig:keyspace}
+\end{image}
+
+Создадим базу данных и заполним ее значениями.
+(рис.~\ref{fig:full}).
+
+\begin{image}
+	\includegrph{img/img4.png}
+	\caption{Заполнение таблицы}
+	\label{fig:full}
+\end{image}
+
+Теперь проверим, что на всех узлах есть созданные таблицы
+(рис.~\ref{fig:check}).
+
+\begin{image}
+	\includegrph{img/img5.png}
+	\caption{Содержимое пространства ключей на разных узлах}
+	\label{fig:check}
+\end{image}
+
+\clearpage
+
+Модель базы данных из прошлого семестра (рис.~\ref{fig:past}).
+
+\begin{image}
+	\includegrph{img/img6.png}
+	\caption{Модель базы данных из прошлого семестра}
+	\label{fig:past}
+\end{image}
+
+\section*{\LARGE Вывод}
+\addcontentsline{toc}{section}{Вывод}
+В результате практической работы была изучена работа
+с распределенной бд, используя Apache Cassandra.\par
+Были созданы докер контейнеры прдеставляющие разные узлы.
+И базе данных созданы таблицы.
