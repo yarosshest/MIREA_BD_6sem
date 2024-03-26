@@ -38,55 +38,28 @@ Tombstones генерируются при помощи:
 
 \section{Утилита sstabledump и ее установка}
 
-Для начала необходимо скачать образ Cassandra и запустить контейнер.
 Так как cassandra tools больше нет в образе составим свой Dockerfile для кассандры.
 
+\lstinputlisting[language=yaml]{src/Dockerfile}
+
+Соберем и запустим контейнер
+
 \begin{lstlisting}[language=bash]
-docker pull cassandra
-docker run -d --name cas cassandra
-docker exec -ti cas bash
+	docker build -t cas_ub .
+	docker run --name cas_ub cas_ub
 \end{lstlisting}
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 12-24-42}
-	\caption{Создание образа Cassandra}
-	\label{fig:docker:cas}
-\end{image}
-
-Далее:
-\begin{itemize}
-	\item добавим репозиторий с инструментами Cassandra (echo …);
-	\item обновим зависимости;
-	\item скачаем необходимые пакеты для работы (curl, gnupg);
-	\item подпишем репозиторий для скачивания необходимого нам пакета;
-	\item обновим зависимости с целью поттягивания репозитория;
-	\item скачаем пакет cassandra-tools.
-\end{itemize}
-
-После этого его можно использовать.
-
-\begin{lstlisting}[language=bash]
-\$ echo "deb https://debian.cassandra.apache.org 40x main" | tee –a
-	/etc/apt/sources.list.d/cassandra.sources.list
-\$ apt update \&\& apt upgrade
-\$ apt install curl
-\$ apt-get install gnupg
-\$ curl https://downloads.apache.org/cassandra/KEYS | apt-key add -
-\$ apt-get update
-\$ apt-get install cassandra-tools
-\end{lstlisting}
-
-\begin{image}
-	\includegrph{Screenshot from 2024-03-18 12-26-33}
-	\caption{Настрока контейнера}
-	\label{fig:docker:bash}
+	\includegrph{img.png}
+	\caption{Подключение к Cassandra}
+	\label{fig:docker:con:cas}
 \end{image}
 
 \section{Создание keyspace и таблиц}
 
-В данной практической работе будет использоваться keyspace "cycling"
-для того, чтобы продемонстрировать различные варианты tombstone. Будут
-использоваться следующие таблицы:
+В данной практической работе будет использоваться keyspace \("\)cycling\("\)
+для того, чтобы продемонстрировать различные варианты tombstone.
+Будут использоваться следующие таблицы:
 
 \begin{itemize}
 	\item rand\_by\_year\_and\_cycling\_name
@@ -101,76 +74,76 @@ docker exec -ti cas bash
 
 \begin{lstlisting}[language=bash]
 CREATE KEYSPACE cycling WITH replication =
-{'class': 'SimpleStrategy', 'replication\_factor': '1'} AND durable\_writes =
+{'class': 'SimpleStrategy', 'replication_factor': '1'} AND durable_writes =
 true;
 
-CREATE TABLE cycling.rank\_by\_year\_and\_name (
- race\_year int,
- race\_name text,
+CREATE TABLE cycling.rank_by_year_and_name (
+ race_year int,
+ race_name text,
  rank int,
- cyclist\_name text,
- PRIMARY KEY ((race\_year, race\_name), rank)
+ cyclist_name text,
+ PRIMARY KEY ((race_year, race_name), rank)
 ) WITH CLUSTERING ORDER BY (rank ASC);
 
-INSERT INTO cycling.rank\_by\_year\_and\_name
-(race\_year, race\_name, cyclist\_name, rank)
+INSERT INTO cycling.rank_by_year_and_name
+(race_year, race_name, cyclist_name, rank)
 VALUES
 (2015, 'Tour of Japan - Stage 4 - Minami > Shinshu', 'Benjamin PRADES', 1);
 
-INSERT INTO cycling.rank\_by\_year\_and\_name
-(race\_year, race\_name, cyclist\_name, rank)
+INSERT INTO cycling.rank_by_year_and_name
+(race_year, race_name, cyclist_name, rank)
 VALUES
 (2015, 'Tour of Japan - Stage 4 - Minami > Shinshu', 'Adam PHELAN', 2);
 
-INSERT INTO cycling.rank\_by\_year\_and\_name
-(race\_year, race\_name, cyclist\_name, rank)
+INSERT INTO cycling.rank_by_year_and_name
+(race_year, race_name, cyclist_name, rank)
 VALUES
 (2015, 'Tour of Japan - Stage 4 - Minami > Shinshu', 'Thomas
 
 LEBAS', 3);
-INSERT INTO cycling.rank\_by\_year\_and\_name
-(race\_year, race\_name, cyclist\_name, rank)
+INSERT INTO cycling.rank_by_year_and_name
+(race_year, race_name, cyclist_name, rank)
 VALUES
 (2015, 'Giro d''Italia - Stage 11 - Forli > Imola', 'Ilnur
 
 ZAKARIN', 1);
-INSERT INTO cycling.rank\_by\_year\_and\_name
-(race\_year, race\_name, cyclist\_name, rank)
+INSERT INTO cycling.rank_by_year_and_name
+(race_year, race_name, cyclist_name, rank)
 VALUES
 (2015, 'Giro d''Italia - Stage 11 - Forli > Imola', 'Carlos
 
 BETANCUR', 2);
-INSERT INTO cycling.rank\_by\_year\_and\_name
-(race\_year, race\_name, cyclist\_name, rank)
+INSERT INTO cycling.rank_by_year_and_name
+(race_year, race_name, cyclist_name, rank)
 VALUES
 (2014, '4th Tour of Beijing', 'Phillippe GILBERT', 1);
 
-INSERT INTO cycling.rank\_by\_year\_and\_name
-(race\_year, race\_name, cyclist\_name, rank)
+INSERT INTO cycling.rank_by_year_and_name
+(race_year, race_name, cyclist_name, rank)
 VALUES
 (2014, '4th Tour of Beijing', 'Daniel MARTIN', 2);
 
-INSERT INTO cycling.rank\_by\_year\_and\_name
-(race\_year, race\_name, cyclist\_name, rank)
+INSERT INTO cycling.rank_by_year_and_name
+(race_year, race_name, cyclist_name, rank)
 VALUES
 (2014, '4th Tour of Beijing', 'Johan Esteban CHAVES', 3);
 
-CREATE TABLE cycling.cyclist\_career\_teams (
+CREATE TABLE cycling.cyclist_career_teams (
  id UUID PRIMARY KEY,
  lastname text,
  teams set<text>
 );
 CREATE TABLE cycling.calendar (
- race\_id int,
- race\_name text,
- race\_start\_date timestamp,
- race\_end\_date timestamp,
- PRIMARY KEY (race\_id, race\_start\_date, race\_end\_date)
+ race_id int,
+ race_name text,
+ race_start_date timestamp,
+ race_end_date timestamp,
+ PRIMARY KEY (race_id, race_start_date, race_end_date)
 );
 \end{lstlisting}
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 12-26-33}
+	\includegrph{img_1.png}
 	\caption{Заполнение базы данных}
 	\label{fig:cqlsh:create}
 \end{image}
@@ -182,29 +155,29 @@ flush для созданного keyspace. Она необходима для �
 SSTable-файлы, для дальнейшего использования.
 
 \begin{lstlisting}[language=bash]
-\$ nodetool flush cycling;
+nodetool flush cycling;
 \end{lstlisting}
 
 После выполнения команды необходимо получить выгрузку в формате
 json с помощью утилиты sstabledump из файла. Для начала необходимо перейти
-в соответствующую директорию cycling и найти rank\_by\_year\_and\_name-<...>.
+в соответствующую директорию cycling и найти rank\_by\_year\_and\_name-<\ldots>.
 Название папки может частично отличаться.
 Чтобы узнать имя необходимой директории перейдите
-в /var/lib/cassandra/data/cycling и введите команду \texttt{ls}.
+в /apache-cassandra-4.0.12/data/data/cycling и введите команду \texttt{ls}.
 
 \begin{lstlisting}[language=bash]
-\$ cd /var/lib/cassandra/data/cycling/
-	rank\_by\_year\_and\_namebc05fba12baf11e8b4a8ad2b042f3e18
+/apache-cassandra-4.0.12/data/data/cycling
+	rank_by_year_and_name
 \end{lstlisting}
 
-После этого выполняем команду sstabledump для файла "<mc-2-big-Data.db">.
+После этого выполняем команду sstabledump для файла \("\)<nb-1-big-Data.db\("\)>.
 
 \begin{lstlisting}[language=bash]
-\$ sstabledump mc-2-big-Data.db
+sstabledump nb-1-big-Data.db
 \end{lstlisting}
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 13-43-09}
+	\includegrph{img_2.png}
 	\caption{Выгрузка в формате json}
 	\label{fig:sstabledump:json}
 \end{image}
@@ -216,19 +189,20 @@ Tombstone для разделов (Partition tombstones) создаются, к�
 ключом раздела (partition key).
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 13-46-28}
+	\includegrph{img_3.png}
 	\caption{Удаление раздела}
 	\label{fig:cqlsh:partition:delete}
 \end{image}
 
 В выводе \texttt{sstabledump} для данного раздела (тут также необходимо
 выполнить nodetool flush и получить выгрузку с последнего созданного
-файла "<<...>-big-Data.db">). Данные о времени удаления (deletion\_info)
+файла \("\)<<\ldots>-big-Data.db\("\)>).
+Данные о времени удаления (deletion\_info)
 написаны на уровне раздела и не привязаны к конкретным строкам или
 ячейкам.
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 13-47-29}
+	\includegrph{img_4.png}
 	\caption{Выгрузка в формате json}
 	\label{fig:sstabledump:partition:delete}
 \end{image}
@@ -242,7 +216,7 @@ Tombstone для строк генерируется при удалении д�
 затрагивает оба ключа.
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 13-48-37}
+	\includegrph{img_5.png}
 	\caption{Удаление строки}
 	\label{fig:cqlsh:line:delete}
 \end{image}
@@ -253,7 +227,7 @@ tombstone маркер deletion\_info находится на уровне ст�
 При этом раздел и ячейки не содержат этого маркера.
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 13-55-29}
+	\includegrph{img_6.png}
 	\caption{Выгрузка в формате json}
 	\label{fig:sstabledump:line:delete}
 \end{image}
@@ -270,7 +244,7 @@ rank\_by\_year\_and\_name и создать заново, перезаполни
 \texttt{sstabledump}.
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 14-03-52}
+	\includegrph{img_7.png}
 	\caption{Удаление строки}
 	\label{fig:cqlsh:range:delete}
 \end{image}
@@ -279,7 +253,7 @@ rank\_by\_year\_and\_name и создать заново, перезаполни
 маркера range\_tombstone\_bound, которые отмечают область удаленных записей.
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 14-04-04}
+	\includegrph{img_8.png}
 	\caption{Выгрузка в формате json}
 	\label{fig:sstabledump:range:delete}
 \end{image}
@@ -292,7 +266,7 @@ cyclist\_care\_teams. Выполните следующую команду в cq
 вставить запись в таблицу.
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 13-55-29}
+	\includegrph{img_9.png}
 	\caption{Удаление строки}
 	\label{fig:cqlsh:complexcolumn}
 \end{image}
@@ -302,7 +276,7 @@ cyclist\_career\_teams маркер deletion\_info указан на уровн�
 только для столбцов типа коллекции, хоть в разделе не происходит удаления.
 
 \begin{image}
-	\includegrph{Screenshot from 2024-03-18 13-57-48}
+	\includegrph{img_10.png}
 	\caption{Выгрузка в формате json}
 	\label{fig:sstabledump:complexcolumn}
 \end{image}
@@ -314,7 +288,15 @@ Tombstone для ячеек создаются при удалении знач�
 В данном случае deletion\_info будет привязано к конкретной ячейке.
 
 \begin{image}
-	\includegrph{cell}
+	\includegrph{img_11.png}
+	\caption{Удаление ячейки }
+	\label{fig:cqlsh-sstabledump:complexcolumn:sql}
+\end{image}
+
+В данном случае deletion\_info будет привязано к конкретной ячейке.
+
+\begin{image}
+	\includegrph{img_12.png}
 	\caption{Удаление ячейки и выгрузка в формате json}
 	\label{fig:cqlsh-sstabledump:complexcolumn}
 \end{image}
@@ -322,7 +304,8 @@ Tombstone для ячеек создаются при удалении знач�
 \section{Установка времени жизни записи (TTL)}
 
 TTL можно использовать для вставки данных в таблицу на определенный
-срок, указываемый в секундах. Чтобы задать TTL для записи, используются
+срок, указываемый в секундах.
+Чтобы задать TTL для записи, используются
 ключевые слова USING TTL. Чтобы определить время жизни записи
 необходима функция TTL.\par
 Вставьте данные в таблицу cycling.calendar и используйте USING
@@ -335,7 +318,7 @@ TTL, чтобы установить период истечения жизни 
 Также можно установить TTL для одной ячейки.
 
 \begin{image}
-	\includegrph{ttl}
+	\includegrph{img_13.png}
 	\caption{Установка времени жизни записи ttl}
 	\label{fig:ttl}
 \end{image}
@@ -350,7 +333,7 @@ DELETE. Также даже если раздел содержит только 
 строку (partition key: 200) маркером "expired" : true в разделе liveness\_info.
 
 \begin{image}
-	\includegrph{tombstones}
+	\includegrph{img_14.png}
 	\caption{Выгрузка в формате json}
 	\label{fig:tombstones:cycling}
 \end{image}
@@ -358,7 +341,7 @@ DELETE. Также даже если раздел содержит только 
 Во втором случае помечается отдельная ячейка.
 
 \begin{image}
-	\includegrph{tombstones1}
+	\includegrph{img_15.png}
 	\caption{Выгрузка в формате json}
 	\label{fig:tombstone:rank-by-year-and-name}
 \end{image}
