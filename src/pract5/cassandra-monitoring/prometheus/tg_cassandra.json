@@ -1,0 +1,12 @@
+[
+  {
+    "targets": [ 
+      "host.docker.internal:61621", 
+      "host.docker.internal:61622", 
+      "host.docker.internal:61623"
+    ],
+    "labels": {
+      "cluster": "test_cluster"
+    }
+  }
+]

@@ -173,21 +173,9 @@ Latency 95\% и 99\% указывают вам точку, в которой 95\
 диапазона.
 
 \begin{image}
-	\includegrph{write}
+	\includegrph{writeAll}
 	\caption{График Write}
 	\label{fig:writing}
-\end{image}
-
-\begin{image}
-	\includegrph{write_l95}
-	\caption{График Write Latency 95\%}
-	\label{fig:write_l95}
-\end{image}
-
-\begin{image}
-	\includegrph{write_l99}
-	\caption{График Write Latency 99\%}
-	\label{fig:write_l99}
 \end{image}
 
 \section{Задержка при чтении (Read Latency)}
@@ -254,22 +242,29 @@ if __name__ == "__main__":
 \end{lstlisting}
 
 \begin{image}
-	\includegrph{read}
-	\caption{График Read}
+	\includegrph{read10}
+	\caption{График Read в 10 потоков}
 	\label{fig:reading}
 \end{image}
 
 \begin{image}
-	\includegrph{read_l99}
-	\caption{График Read Latency 99\%}
-	\label{fig:read_l99}
+	\includegrph{read25}
+	\caption{График Read в 25 потоков}
+	\label{fig:read25}
 \end{image}
 
 \begin{image}
-	\includegrph{read_l95}
-	\caption{График Read Latency 95\%}
-	\label{fig:read_l95}
+	\includegrph{read50}
+	\caption{График Read в 50 потоков}
+	\label{fig:read50}
 \end{image}
+
+\begin{image}
+	\includegrph{read100}
+	\caption{График Read в 100 потоков}
+	\label{fig:read100}
+\end{image}
+
 
 \clearpage
 

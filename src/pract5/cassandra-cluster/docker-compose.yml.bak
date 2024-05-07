@@ -1,0 +1,64 @@
+version: '3'
+
+networks:
+    monitoring:
+        driver: bridge
+
+services:
+  cassandra-seed:
+    build: cassandra-builder
+    ports:
+      - 9042:9042
+      - 61621:61621
+      - 9100:9100
+    volumes:
+      - "cassandra_data_seed:/var/lib/cassandra"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-zyzz-cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=datacenter1
+      - AUTO_BOOTSTRAP=false
+    networks:
+      - monitoring
+
+  cassandra-node1:
+    build: cassandra-builder
+    ports:
+      - 19042:9042
+      - 61622:61621
+      - 9101:9100
+    volumes:
+      - "cassandra_data_1:/var/lib/cassandra"
+    environment:
+      - CASSANDRA_SEEDS=cassandra-seed
+      - CASSANDRA_CLUSTER_NAME=cassandra-zyzz-cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=datacenter1
+    networks:
+      - monitoring
+    depends_on:
+      - cassandra-seed
+      
+  cassandra-node2:
+    build: cassandra-builder
+    ports:
+      - 29042:9042
+      - 61623:61621
+      - 9102:9100
+    volumes:
+      - "cassandra_data_2:/var/lib/cassandra"
+    environment:
+      - CASSANDRA_SEEDS=cassandra-seed
+      - CASSANDRA_CLUSTER_NAME=cassandra-zyzz-cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=datacenter1
+    networks:
+      - monitoring
+    depends_on:
+      - cassandra-seed
+      - cassandra-node1
+
+volumes:
+  cassandra_data_seed:
+  cassandra_data_1:
+  cassandra_data_2:
