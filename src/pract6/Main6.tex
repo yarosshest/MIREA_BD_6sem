@@ -1,0 +1,20 @@
+\documentclass[14pt,a4paper,oneside]{extarticle}
+
+\usepackage{../Settings/Style}
+\usepackage{hyperref}
+
+\date{\today}
+
+\begin{document}
+    \renewcommand{\figurename}{Рисунок}
+    \renewcommand{\contentsname}{Содержание}
+    \renewcommand{\bibname}{Список литературы}
+
+    \includepdf[pages=-]{T.pdf}
+    \tableofcontents
+
+    \clearpage
+    \include{intro}
+    \include{report}
+
+\end{document}

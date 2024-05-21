@@ -1,0 +1,20 @@
+db.products.insertOne(
+    {
+     "_id":1,
+     "product_name": "Samsung S3",
+     "category": "mobiles",
+     "product_total": 5,
+     "product_available": 3,
+     "product_bought_by": [
+         {
+         "customer": "john",
+         "date": "7-Jan-2014"
+         },
+         {
+         "customer": "mark",
+         "date": "8-Jan-2014"
+         }
+     ]
+    }
+
+)

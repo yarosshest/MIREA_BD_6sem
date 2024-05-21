@@ -1,0 +1,21 @@
+db.first.insertOne(
+    {
+     "contact": "987654321",
+     "dob": "01-01-1991",
+     "name": "Tom Benzamin",
+     "address": [
+         {
+         "building": "22 A, Indiana Apt",
+         "pincode": 123456,
+         "city": "Los Angeles",
+         "state": "California"
+         },
+         {
+         "building": "170 A, Acropolis Apt",
+         "pincode": 456789,
+         "city": "Chicago",
+         "state": "Illinois"
+         }
+     ]
+    }
+ )
