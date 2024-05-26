@@ -1,0 +1,117 @@
+\graphicspath{{img}} % path to graphics
+\section*{\LARGE Выполнение практической работы}
+\addcontentsline{toc}{section}{Выполнение практической работы}
+
+\section{Docker-compose}
+Для обеспечения работы базы данных в контейнеризованной среде был разработан файл \texttt{docker-compose.yml}.
+Этот файл представляет собой описание сервисов и их конфигураций,
+которые будут развернуты с помощью Docker Compose.\par
+В соответствии с требованиями, изложенными во введении,
+в файле \texttt{docker-compose.yml} определены следующие сервисы:
+
+
+\lstinputlisting[language=yaml]{code//docker-compose.yml}
+
+
+Команда для запуска контейнеров на основе файла \texttt{docker-compose.yml}:
+
+\begin{lstlisting}[language=bash]
+docker-compose up -d --build
+\end{lstlisting}
+
+
+\section{Проетирования таблиц}
+Была спроектирована архитектура базы данных, с помощью диаграммы классов
+
+\begin{image}
+    \includegrph{diagramm.drawio}
+    \caption{Архитектура базы данных}
+    \label{fig:architec}
+\end{image}
+
+\section{Реализация работы с колейций}
+Для работы с коллекциями был создан интерфейс Collection
+
+\lstinputlisting[language=python]{code//Collection.py}
+
+Для данного интерфейса были реализованны реализации коллекций.
+
+\lstinputlisting[language=python]{code//Address.py}
+\lstinputlisting[language=python]{code//Clients.py}
+\lstinputlisting[language=python]{code//Furniture.py}
+\lstinputlisting[language=python]{code//FurnitureTypes.py}
+\lstinputlisting[language=python]{code//Order.py}
+\clearpage
+
+\section{Работа приложения в действии}
+
+В данной главе представлены скриншоты работы приложения,созданного на основе разработанных моделей и функционала.
+
+Вывод подсказки:
+
+\begin{image}
+    \includegrph{img}
+    \caption{Вывод подсказки}
+    \label{fig:help}
+\end{image}
+
+Вывод коллекции:
+
+\begin{image}
+    \includegrph{img_1}
+    \caption{Вывод коллекции}
+    \label{fig:show}
+\end{image}
+
+\clearpage
+
+Добавление документа:
+
+\begin{image}
+    \includegrph{img_2}
+    \caption{Добавление документа}
+    \label{fig:new}
+\end{image}
+
+\clearpage
+Удаление документа по критерию:
+
+\begin{image}
+    \includegrph{img_3}
+    \caption{Удаление документа}
+    \label{fig:del}
+\end{image}
+
+Поиск документов по критерию с сортировкой:
+
+\begin{image}
+    \includegrph{img_4}
+    \caption{Поиск документов}
+    \label{fig:showWith}
+\end{image}
+\clearpage
+
+Вывод коллекции с сортировкой:
+
+\begin{image}
+    \includegrph{img_5}
+    \caption{Вывод коллекции с сортировкой}
+    \label{fig:showSort}
+\end{image}
+
+\clearpage
+Данные в mongo:
+\begin{image}
+    \includegrph{img_6}
+    \caption{Данные в mongo}
+    \label{fig:inmongo}
+\end{image}
+
+\section*{\LARGE Вывод}
+\addcontentsline{toc}{section}{Вывод}
+
+В результате выполнения данной практической работы было создано
+приложение для управления производством мебели.
+Для разработки приложения был выбран язык программирования Python.\par
+Исходный код проекта доступен на GitHub по следующей ссылке:
+\url{https://github.com/yarosshest/MIREA_6_sem_BD_con/tree/master}.
